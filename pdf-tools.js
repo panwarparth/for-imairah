@@ -1,64 +1,49 @@
-// 🧑‍💻 Imairah’s IT Guy Portal — Working Instant Download Version
+// 🧑‍💻 IT Portal for Miru ❤️ — Guaranteed Instant Download (FileSaver.js)
 async function splitPDF() {
   const fileInput = document.getElementById('pdfFile');
   const pagesInput = document.getElementById('pagesInput').value.trim();
   const status = document.getElementById('status');
 
-  if (!fileInput.files.length) {
-    status.textContent = 'Please upload a PDF first 📄';
-    return;
-  }
+  if (!fileInput.files.length) return status.textContent = 'Please upload a PDF first 📄';
+  if (!pagesInput) return status.textContent = 'Enter pages like 1-3 or 2,5 ❤️';
 
-  if (!pagesInput) {
-    status.textContent = 'Please enter page numbers like 1-3 or 2,5 ❤️';
-    return;
-  }
+  status.textContent = '✂️ Cutting pages... please wait';
 
   try {
     const file = fileInput.files[0];
     const arrayBuffer = await file.arrayBuffer();
     const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
     const newPdf = await PDFLib.PDFDocument.create();
-    const totalPages = pdfDoc.getPageCount();
+    const total = pdfDoc.getPageCount();
 
+    // Parse pages
     const pages = [];
     pagesInput.split(',').forEach(part => {
       part = part.trim();
       if (part.includes('-')) {
-        const [start, end] = part.split('-').map(Number);
-        for (let i = start; i <= end; i++) {
-          if (!isNaN(i) && i > 0 && i <= totalPages) pages.push(i);
-        }
+        const [a, b] = part.split('-').map(Number);
+        for (let i = a; i <= b; i++) if (i >= 1 && i <= total) pages.push(i);
       } else {
-        const num = parseInt(part);
-        if (!isNaN(num) && num > 0 && num <= totalPages) pages.push(num);
+        const n = parseInt(part);
+        if (n >= 1 && n <= total) pages.push(n);
       }
     });
+    if (!pages.length) return status.textContent = 'No valid pages found 😅';
 
-    if (pages.length === 0) {
-      status.textContent = "No valid pages found 😅";
-      return;
-    }
-
-    for (const num of pages) {
-      const [page] = await newPdf.copyPages(pdfDoc, [num - 1]);
-      newPdf.addPage(page);
+    // Copy pages
+    for (const n of pages) {
+      const [pg] = await newPdf.copyPages(pdfDoc, [n - 1]);
+      newPdf.addPage(pg);
     }
 
     const pdfBytes = await newPdf.save();
-    const blob = new Blob([pdfBytes], { type: "application/pdf" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "Imairah_Cutie_Pages.pdf";
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 
-    status.textContent = `✨ Done! Your split PDF is ready ❤️ (${pages.length} page${pages.length>1?'s':''})`;
+    // ✅ Force save dialog (FileSaver)
+    saveAs(blob, 'Imairah_Cutie_Pages.pdf');
+    status.textContent = `✅ Done! Downloading ${pages.length} page${pages.length>1?'s':''} ❤️`;
   } catch (err) {
     console.error(err);
-    status.textContent = "Oops, something went wrong 😅";
+    status.textContent = 'Something went wrong 😅';
   }
 }
