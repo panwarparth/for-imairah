@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Imairah ❤️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 🎀 HOME COUNTDOWN -->
+  <div id="homeSection" class="fade-section visible">
+    <h1>Hey Imairah ❤️</h1>
+    <p>Your special day is on the way...</p>
+    <div id="countdown"></div>
+    <button onclick="startExperience()">Start Experience 🎁</button>
+  </div>
+
+  <!-- 💫 MENU SECTION -->
+  <div id="menuSection" class="fade-section">
+    <h1>Welcome, Imairah 💖</h1>
+    <p>Choose what you want to explore:</p>
+    <div class="menu-buttons">
+      <button onclick="showSection('messages')">💌 Cute Messages</button>
+      <button onclick="showSection('pdfTool')">🧑‍💻 IT Guy Portal</button>
+      <button onclick="showSection('home')">🏠 Back to Countdown</button>
+    </div>
+  </div>
+
+  <!-- 💌 CUTE MESSAGES -->
+  <div id="messagesSection" class="fade-section">
+    <h2>💌 A message for you 💞</h2>
+    <p id="messageText">Click below for something sweet.</p>
+    <button onclick="newMessage()">Show Message 💫</button><br><br>
+    <button onclick="showSection('menu')">⬅️ Back to Menu</button>
+  </div>
+
+  <!-- 🧑‍💻 IT GUY PORTAL -->
+  <div id="pdfTool" class="fade-section">
+    <h2>🧑‍💻 IT Portal for Miru ❤️</h2>
+    <p>Upload your PDF and enter pages to keep (e.g. 1-3 or 2,4,5)</p>
+    <input type="file" id="pdfFile" accept="application/pdf"><br><br>
+    <input type="text" id="pagesInput" placeholder="Pages (e.g. 1-3 or 2,4,5)"
+      style="padding:10px; border-radius:10px; border:none; width:200px;">
+    <button onclick="splitPDF()" style="margin-left:10px; padding:10px 20px; border:none; border-radius:20px; background:white; color:#ff1493; font-weight:600;">
+      Split It for me my IT guy 💾
+    </button>
+    <p id="status" style="margin-top:15px;"></p>
+    <button onclick="showSection('menu')">⬅️ Back to Menu</button>
+  </div>
+
+  <audio id="music" src="assets/music.mp3"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="script.js"></script>
+  <script src="pdf-tool.js"></script>
+</body>
+</html>
