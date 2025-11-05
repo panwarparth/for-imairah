@@ -5,7 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>For Imairah ❤️</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(270deg, #ff758c, #ff7eb3, #ffc1cc);
+      background-size: 600% 600%;
+      animation: gradientShift 15s ease infinite;
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      text-align: center;
+      overflow: hidden;
+    }
+    .fade-section {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 1.2s ease;
+      pointer-events: none;
+    }
+    .fade-section.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    h1 { font-size: 3em; margin: 0; }
+    p { font-size: 1.2em; }
+    #countdown {
+      font-size: 2em;
+      font-weight: 600;
+      margin-top: 25px;
+      text-shadow: 0 0 10px #fff, 0 0 20px #ffb6c1, 0 0 40px #ff69b4;
+    }
+    button {
+      margin-top: 30px;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 40px;
+      font-size: 1.1em;
+      background: white;
+      color: #ff1493;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+    button:hover { transform: scale(1.08); background: #ffe3f0; }
+    .heart {
+      position: fixed;
+      bottom: 0;
+      font-size: 2rem;
+      animation: floatUp 6s linear infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+    }
+  </style>
 </head>
 <body>
   <!-- 🎀 HOME COUNTDOWN -->
@@ -49,15 +113,104 @@
     <button onclick="showSection('menu')">⬅️ Back to Menu</button>
   </div>
 
-  <audio id="music" src="assets/music.mp3" preload="auto"></audio>
+  <audio id="music" preload="auto"></audio>
 
-  <!-- 📦 External Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
-  <!-- ⚙️ Your Scripts -->
-  <script src="script.js"></script>
-  <script src="pdf-tool.js?v=4"></script>
+  <script>
+  // 🎉 COUNTDOWN TIMER
+  const targetDate = new Date("Nov 28, 2025 00:00:00").getTime();
+  setInterval(() => {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+    const d = Math.floor(distance / (1000*60*60*24));
+    const h = Math.floor((distance%(1000*60*60*24))/(1000*60*60));
+    const m = Math.floor((distance%(1000*60*60))/(1000*60));
+    const s = Math.floor((distance%(1000*60))/1000);
+    document.getElementById("countdown").textContent = distance>0 ? `${d}d ${h}h ${m}m ${s}s` : "🎂 It's your day, Miru! 🎉";
+  },1000);
+
+  // 🎀 NAVIGATION
+  function fadeToSection(id){
+    document.querySelectorAll('.fade-section').forEach(sec=>sec.classList.remove('visible'));
+    const next=document.getElementById(id);
+    setTimeout(()=>next.classList.add('visible'),200);
+  }
+  function startExperience(){
+    fadeToSection('menuSection');
+    setInterval(()=>{
+      const heart=document.createElement('div');
+      heart.classList.add('heart');
+      heart.textContent='💗';
+      heart.style.left=Math.random()*100+'vw';
+      heart.style.animationDuration=(3+Math.random()*3)+'s';
+      document.body.appendChild(heart);
+      setTimeout(()=>heart.remove(),6000);
+    },300);
+  }
+  function showSection(section){
+    fadeToSection(section==='home'?'homeSection':section==='menu'?'menuSection':section==='messages'?'messagesSection':'pdfTool');
+  }
+
+  // 💌 MESSAGES
+  const messages=[
+    "You make ordinary days feel magical 💖",
+    "You're my favorite notification 🥰",
+    "Even your chaos feels perfect 💞",
+    "If smiles were stars, you'd light up the galaxy 🌌"
+  ];
+  function newMessage(){
+    const msg=messages[Math.floor(Math.random()*messages.length)];
+    document.getElementById("messageText").textContent=msg;
+  }
+
+  // 🧑‍💻 PDF SPLITTER
+  async function splitPDF(){
+    const fileInput=document.getElementById('pdfFile');
+    const pagesInput=document.getElementById('pagesInput').value.trim();
+    const status=document.getElementById('status');
+    if(!fileInput.files.length)return status.textContent='Please upload a PDF first 📄';
+    if(!pagesInput)return status.textContent='Enter pages like 1-3 or 2,5 ❤️';
+    status.textContent='✂️ Cutting pages... please wait';
+    try{
+      const file=fileInput.files[0];
+      const buf=await file.arrayBuffer();
+      const src=await PDFLib.PDFDocument.load(buf);
+      const out=await PDFLib.PDFDocument.create();
+      const total=src.getPageCount();
+      const list=[];
+      pagesInput.split(',').forEach(x=>{
+        if(x.includes('-')){
+          const [a,b]=x.split('-').map(Number);
+          for(let i=a;i<=b;i++)if(i>=1&&i<=total)list.push(i);
+        }else{
+          const n=parseInt(x);
+          if(n>=1&&n<=total)list.push(n);
+        }
+      });
+      if(!list.length)return status.textContent='No valid pages found 😅';
+      for(const n of list){
+        const [pg]=await out.copyPages(src,[n-1]);
+        out.addPage(pg);
+      }
+      const bytes=await out.save();
+      const blob=new Blob([bytes],{type:'application/pdf'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;
+      a.download='Imairah_Cutie_Pages.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      status.textContent=`✅ Done! Downloading ${list.length} page${list.length>1?'s':''} ❤️`;
+    }catch(e){
+      console.error(e);
+      status.textContent='Something went wrong 😅';
+    }
+  }
+  </script>
 </body>
 </html>
+
