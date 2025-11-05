@@ -1,60 +1,66 @@
-// 🧑‍💻 IT Guy Portal for Miru ❤️ (Instant-Download Fixed)
+// 🧑‍💻 IT Guy Portal for Miru ❤️ — fully working download
 async function splitPDF() {
   const fileInput = document.getElementById('pdfFile');
   const pagesInput = document.getElementById('pagesInput').value.trim();
   const status = document.getElementById('status');
 
-  // 🛑 Validate input
-  if (!fileInput.files.length) return status.textContent = 'Please upload a PDF first 📄';
-  if (!pagesInput) return status.textContent = 'Enter pages like 1-3 or 2,5 ❤️';
+  if (!fileInput.files.length) {
+    status.textContent = 'Please upload a PDF first 📄';
+    return;
+  }
+  if (!pagesInput) {
+    status.textContent = 'Enter pages like 1-3 or 2,5 ❤️';
+    return;
+  }
+
+  status.textContent = '✂️ Cutting pages... please wait';
 
   try {
-    // 🧾 Read uploaded PDF
     const file = fileInput.files[0];
-    const arrayBuffer = await file.arrayBuffer();
-    const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-    const newPdf = await PDFLib.PDFDocument.create();
-    const totalPages = pdfDoc.getPageCount();
+    const buffer = await file.arrayBuffer();
+    const src = await PDFLib.PDFDocument.load(buffer);
+    const out = await PDFLib.PDFDocument.create();
+    const total = src.getPageCount();
 
-    // 🔢 Parse user input (supports 1-3,5,7-9)
+    // Parse input like "1-3,5"
     const pages = [];
-    pagesInput.split(',').forEach(part => {
-      part = part.trim();
-      if (part.includes('-')) {
-        const [start, end] = part.split('-').map(Number);
-        for (let i = start; i <= end; i++) if (i > 0 && i <= totalPages) pages.push(i);
+    pagesInput.split(',').forEach(p => {
+      p = p.trim();
+      if (p.includes('-')) {
+        const [a, b] = p.split('-').map(Number);
+        for (let i = a; i <= b; i++) if (i >= 1 && i <= total) pages.push(i);
       } else {
-        const num = parseInt(part);
-        if (!isNaN(num) && num > 0 && num <= totalPages) pages.push(num);
+        const n = parseInt(p);
+        if (n >= 1 && n <= total) pages.push(n);
       }
     });
-
-    if (!pages.length) return status.textContent = 'No valid pages found 😅';
-
-    // 📄 Copy selected pages into new PDF
-    for (const num of pages) {
-      const [page] = await newPdf.copyPages(pdfDoc, [num - 1]);
-      newPdf.addPage(page);
+    if (!pages.length) {
+      status.textContent = 'No valid pages found 😅';
+      return;
     }
 
-    // 💾 Create downloadable blob
-    const pdfBytes = await newPdf.save();
+    // Copy pages
+    for (const n of pages) {
+      const [pg] = await out.copyPages(src, [n - 1]);
+      out.addPage(pg);
+    }
+
+    const pdfBytes = await out.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
 
-    // 📥 Force instant download
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'Imairah_Cutie_Pages.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // 🧹 Cleanup + message
+    // Create a hidden <a> inside the user click scope
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Imairah_Cutie_Pages.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    status.textContent = `✨ Done! Downloading your file (${pages.length} page${pages.length>1?'s':''}) ❤️`;
-  } catch (error) {
-    console.error(error);
-    status.textContent = 'Something went wrong 😅 (check your page numbers)';
+
+    status.textContent = `✅ Done! Downloading ${pages.length} page${pages.length>1?'s':''} ❤️`;
+  } catch (err) {
+    console.error(err);
+    status.textContent = 'Something went wrong 😅';
   }
 }
