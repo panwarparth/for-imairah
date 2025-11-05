@@ -1,4 +1,4 @@
-// 🧑‍💻 IT Portal for Miru ❤️ — Guaranteed Instant Download (FileSaver.js)
+// 🧑‍💻 IT Portal for Miru ❤️ — Final Version (with fallback download)
 async function splitPDF() {
   const fileInput = document.getElementById('pdfFile');
   const pagesInput = document.getElementById('pagesInput').value.trim();
@@ -16,7 +16,6 @@ async function splitPDF() {
     const newPdf = await PDFLib.PDFDocument.create();
     const total = pdfDoc.getPageCount();
 
-    // Parse pages
     const pages = [];
     pagesInput.split(',').forEach(part => {
       part = part.trim();
@@ -28,9 +27,9 @@ async function splitPDF() {
         if (n >= 1 && n <= total) pages.push(n);
       }
     });
+
     if (!pages.length) return status.textContent = 'No valid pages found 😅';
 
-    // Copy pages
     for (const n of pages) {
       const [pg] = await newPdf.copyPages(pdfDoc, [n - 1]);
       newPdf.addPage(pg);
@@ -39,8 +38,17 @@ async function splitPDF() {
     const pdfBytes = await newPdf.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 
-    // ✅ Force save dialog (FileSaver)
-    saveAs(blob, 'Imairah_Cutie_Pages.pdf');
+    // ✅ Safe cross-browser download
+    const doSave = window.saveAs || ((b, name) => {
+      const url = URL.createObjectURL(b);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    doSave(blob, 'Imairah_Cutie_Pages.pdf');
     status.textContent = `✅ Done! Downloading ${pages.length} page${pages.length>1?'s':''} ❤️`;
   } catch (err) {
     console.error(err);
