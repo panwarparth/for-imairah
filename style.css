@@ -13,7 +13,6 @@ body {
   overflow: hidden;
 }
 
-/* Sections with fade animation */
 .fade-section {
   position: absolute;
   top: 50%;
@@ -28,11 +27,8 @@ body {
   pointer-events: all;
 }
 
-h1 {
-  font-size: 3em;
-  margin: 0;
-}
-p { font-size: 1.2em; }
+h1 { font-size: 3em; margin: 0; }
+p  { font-size: 1.2em; }
 
 #countdown {
   font-size: 2em;
