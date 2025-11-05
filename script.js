@@ -9,7 +9,8 @@ function updateCountdown() {
   const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
   const s = Math.floor((distance % (1000 * 60)) / 1000);
   document.getElementById("countdown").textContent = `${d}d ${h}h ${m}m ${s}s`;
-  if (distance < 0) document.getElementById("countdown").textContent = "🎂 It's your day, Miru! 🎉";
+  if (distance < 0)
+    document.getElementById("countdown").textContent = "🎂 It's your day, Miru! 🎉";
 }
 
 function fadeToSection(id) {
@@ -33,10 +34,10 @@ function startExperience() {
 }
 
 function showSection(section) {
-  if (section === 'home') fadeToSection('homeSection');
-  if (section === 'menu') fadeToSection('menuSection');
-  if (section === 'messages') fadeToSection('messagesSection');
-  if (section === 'pdfTool') fadeToSection('pdfTool');
+  fadeToSection(section === 'home' ? 'homeSection'
+                 : section === 'menu' ? 'menuSection'
+                 : section === 'messages' ? 'messagesSection'
+                 : 'pdfTool');
 }
 
 const messages = [
@@ -46,6 +47,6 @@ const messages = [
   "If smiles were stars, you'd light up the galaxy 🌌"
 ];
 function newMessage() {
-  const random = messages[Math.floor(Math.random() * messages.length)];
-  document.getElementById("messageText").textContent = random;
+  const msg = messages[Math.floor(Math.random() * messages.length)];
+  document.getElementById("messageText").textContent = msg;
 }
